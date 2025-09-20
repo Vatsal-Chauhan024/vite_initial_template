@@ -1,59 +1,83 @@
-import js from '@eslint/js'
+import eslintJs from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
-import reactRefresh from 'eslint-plugin-react-refresh'
 import tseslint from 'typescript-eslint'
-import {globalIgnores} from 'eslint/config'
-// import simpleImportSort from 'eslint-plugin-simple-import-sort'
-// import unusedImports from 'eslint-plugin-unused-imports'
-// import eslintConfigPrettier from 'eslint-config-prettier/flat'
 import eslintPluginReact from 'eslint-plugin-react'
+import sortImports from 'eslint-plugin-simple-import-sort'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
-export default tseslint.config([
-  globalIgnores(['dist']),
+export default [
   {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      js.configs.recommended,
-      tseslint.configs.recommended,
-      reactHooks.configs['recommended-latest'],
-      reactRefresh.configs.vite,
-      eslintPluginReact.configs.recommended,
-    ],
-    languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-    },
-    rules: {
-      quotes: ['error', 'double'],
-      'no-console': ['error'],
-      // 'simple-import-sort/imports': 'error',
-      // 'simple-import-sort/exports': 'error',
-      // 'unused-imports/no-unused-imports': 'error',
-      // 'unused-imports/no-unused-vars': 'error',
-      'prefer-arrow-callback': ['error'],
-      'prefer-template': ['error'],
-      'no-unreachable': ['error'],
-      'no-alert': 'error',
-      'react/jsx-curly-brace-presence': [
-        'error',
-        {props: 'never', children: 'never'},
-      ],
-      'padding-line-between-statements': [
-        'error',
-        {blankLine: 'always', prev: 'import', next: '*'},
-        {blankLine: 'any', prev: 'import', next: 'import'},
-        {blankLine: 'always', prev: 'return', next: '*'},
-        {blankLine: 'always', prev: '*', next: 'export'},
-      ],
-      'no-multiple-empty-lines': [
-        'error',
-        {
-          max: 1,
-          maxEOF: 1,
-          maxBOF: 0,
-        },
-      ],
-    },
+    ignores: [
+      '.commitlintrc.mjs',
+      'eslint.config.mjs',
+      'packages/mobile/babel.config.js',
+      'packages/mobile/metro.config.js',
+      'commands',
+      '**/dist/'
+    ]
   },
-])
+  ...tseslint.config(
+    {
+      languageOptions: {
+        globals: globals.browser,
+        ecmaVersion: 'latest',
+        sourceType: 'module',
+        parserOptions: {
+          ecmaVersion: 'latest',
+          ecmaFeatures: {
+            jsx: true
+          },
+          sourceType: 'module'
+        }
+      }
+    },
+    {
+      plugins: {
+        'simple-import-sort': sortImports
+      }
+    },
+    reactHooks.configs['recommended-latest'],
+    eslintJs.configs.recommended,
+    eslintPluginReact.configs.flat.recommended,
+    eslintConfigPrettier,
+    ...tseslint.configs.recommended,
+    {
+      rules: {
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          {
+            args: 'all',
+            argsIgnorePattern: '^_',
+            caughtErrors: 'all',
+            caughtErrorsIgnorePattern: '^_',
+            destructuredArrayIgnorePattern: '^_',
+            varsIgnorePattern: '^_',
+            ignoreRestSiblings: true
+          }
+        ],
+        'react-hooks/rules-of-hooks': 'error',
+        'react-hooks/exhaustive-deps': 'error',
+        'react/jsx-uses-react': 'error',
+        'react/jsx-uses-vars': 'error',
+        eqeqeq: 'error',
+        'no-console': 'error',
+        semi: [2, 'never'],
+        'no-multiple-empty-lines': [
+          'error',
+          {
+            max: 2,
+            maxEOF: 1
+          }
+        ],
+        'react/react-in-jsx-scope': 'off'
+      },
+
+      settings: {
+        react: {
+          version: '18.3.1'
+        }
+      }
+    }
+  )
+]
